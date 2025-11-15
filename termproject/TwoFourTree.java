@@ -1,16 +1,13 @@
-/**
-* (2,4) Tree
-*
-* @author Abby Wurster, Brandon Aikman
-* @version 1.0
-* File: TwoFourTree.java
-* Created: Nov 2025
-* Summary of Modifications: Initial version
-* ©Copyright Cedarville University, its Computer Science faculty, and the author.
-*
-* Description: (2,4) Tree implementation
-*/
+package termproject;
 
+/**
+ * Title:        Term Project 2-4 Trees
+ * Description:
+ * Copyright:    Copyright (c) 2001
+ * Company:
+ * @author
+ * @version 1.0
+ */
 public class TwoFourTree
         implements Dictionary {
 
