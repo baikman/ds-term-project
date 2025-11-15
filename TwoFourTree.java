@@ -8,7 +8,7 @@
 * Summary of Modifications: Initial version
 * ©Copyright Cedarville University, its Computer Science faculty, and the author.
 *
-* Description: (2,4) Tree implementation
+* Description: (2,4) Tree implementation.
 */
 
 public class TwoFourTree
