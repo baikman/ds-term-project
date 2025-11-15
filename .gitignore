@@ -1,11 +1,11 @@
 *.class
-# Comparator.java
-# ElementNotFoundException.java
-# InvalidIntegerException.java
-# TFNodeException.java
-# TwoFourTreeException.java
-# Dictionary.java
-# IntegerComparator.java
-# Item.java
-# TFNode.java
-# TwoFourTree.java
+Comparator.java
+ElementNotFoundException.java
+InvalidIntegerException.java
+TFNodeException.java
+TwoFourTreeException.java
+Dictionary.java
+IntegerComparator.java
+Item.java
+TFNode.java
+TwoFourTree.java
