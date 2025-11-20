@@ -11,8 +11,7 @@
 * Description: (2,4) Tree implementation.
 */
 
-public class TwoFourTree
-        implements Dictionary {
+public class TwoFourTree implements Dictionary {
 
     private Comparator treeComp;
     private int size = 0;
@@ -39,11 +38,34 @@ public class TwoFourTree
     }
 
     /**
+     * 
+     * @param key to be searched for
+     * @return object corresponding to key; null if not found
+     */
+    public int findFG(Object key, TFNode curr) {
+        for (int i = 0; i < curr.getNumItems(); i++) {
+            if (treeComp.isGreaterThanOrEqualTo(curr.getItem(i).element(), key)) {
+                return i;
+            }
+        }
+        return curr.getNumItems();
+    }
+
+    /**
      * Searches dictionary to determine if key is present
      * @param key to be searched for
      * @return object corresponding to key; null if not found
      */
     public Object findElement(Object key) {
+        TFNode currNode = treeRoot;
+        int idx;
+
+        while (currNode != null) {
+            idx = findFG(key, currNode);
+            if (currNode.getItem(idx).key() == key) return currNode.getItem(idx).element();
+            currNode = currNode.getChild(idx);
+        }
+
         return null;
     }
 
@@ -53,6 +75,7 @@ public class TwoFourTree
      * @param element to be inserted
      */
     public void insertElement(Object key, Object element) {
+        
     }
 
     /**
