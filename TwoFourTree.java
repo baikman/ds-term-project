@@ -75,7 +75,20 @@ public class TwoFourTree implements Dictionary {
      * @param element to be inserted
      */
     public void insertElement(Object key, Object element) {
-        
+        TFNode currNode = treeRoot;
+        int idx = findFG(key, currNode);
+        Item item = new Item(key, element);
+
+        while (currNode.getChild(idx) != null) {
+            currNode = currNode.getChild(idx);
+            
+            idx = findFG(key, currNode);
+            // TODO: check for cases when there are duplicate keys
+            // if (currNode.getItem(idx).key() == key);
+            
+        }
+
+        currNode.insertItem(idx, item);
     }
 
     /**
