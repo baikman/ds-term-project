@@ -1,3 +1,5 @@
+import java.io.InvalidObjectException;
+
 /**
 * (2,4) Tree
 *
@@ -36,7 +38,89 @@ public class TwoFourTree implements Dictionary {
     public boolean isEmpty() {
         return (size == 0);
     }
+    
+    // DON'T PANIC WE'RE SUPPOSED TO HAVE A LOT OF SUBROUTINES FOR READABILITY AND WHATNOT
+    public void checkValidKey(Object key) {
+        if (!treeComp.isComparable(key)) { // this is in the requirements 
+            throw new InvalidIntegerException("Key is not comparable"); // In the requirements it says to throw an InvalidObjectException
+        }
+    }
+    public int whatChild(TFNode node) {
+        TFNode parent = node.getParent();
+        for (int i = 0; i < parent.getNumItems(); i++) {
+            if (parent.getChild(i) == node) {
+                return i;
+            }
+        }
+        return parent.getNumItems();
+    }
 
+    public boolean canDoLeftTransfer(TFNode temp) { // I FEEL LIKE THIS MIGHT BE TOO VERBOSE BUT WE CAN FIX IT LATER
+        int childNum = whatChild(temp);
+        if (childNum == 0) {
+            return false;
+        }
+        TFNode parent = temp.getParent();
+        TFNode leftSib = parent.getChild(childNum - 1);
+        if (leftSib.getNumItems() <= 1) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean canDoRightTransfer(TFNode temp) {
+        int childNum = whatChild(temp);
+        TFNode parent = temp.getParent();
+        if (parent.getNumItems() == childNum) {
+            return false;
+        }
+        TFNode rightSib = parent.getChild(childNum + 1);
+        if (rightSib.getNumItems() <= 1) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean canDoLeftFusion(TFNode temp) {
+        int childNum = whatChild(temp);
+        if (childNum == 0) {
+            return false;
+        }
+        return true;
+    }
+    public void leftTransfer() {
+        //TODO: implement
+    }
+    public void rightTransfer() {
+        //TODO: implement
+    }
+    public void leftFusion() {
+        //TODO: implement
+    }
+    public void rightFusion() {
+        //TODO: implement
+    }
+
+    // PLEASE DON'T CHANGE ANYTHING UNTIL WE CAN TALK ABOUT IT
+    // OR AT LEAST JUST COMMENT OUT MY CODE IF YOU DO CHANGE ANYTHING
+    public void fixUnderflow(TFNode curr) {
+        if (canDoLeftTransfer(curr)) {
+            leftTransfer();
+        }
+        else if (canDoRightTransfer(curr)) {
+            rightTransfer();
+        }
+        else if (canDoLeftFusion(curr)) {
+            leftFusion();
+        }
+        else {
+            rightFusion();
+        }
+    }
+
+    public void fixOverflow(TFNode curr) {
+        //TODO: implement
+    }
     /**
      * 
      * @param key to be searched for
@@ -57,12 +141,16 @@ public class TwoFourTree implements Dictionary {
      * @return object corresponding to key; null if not found
      */
     public Object findElement(Object key) {
+        checkValidKey(key);
+        
         TFNode currNode = treeRoot;
-        int idx;
+        int idx = -1;
 
         while (currNode != null) {
             idx = findFG(key, currNode);
-            if (currNode.getItem(idx).key() == key) return currNode.getItem(idx).element();
+            if (currNode.getItem(idx).key() == key) {
+                return currNode.getItem(idx).element(); // Don't double dereference
+            }
             currNode = currNode.getChild(idx);
         }
 
@@ -75,20 +163,37 @@ public class TwoFourTree implements Dictionary {
      * @param element to be inserted
      */
     public void insertElement(Object key, Object element) {
-        TFNode currNode = treeRoot;
-        int idx = findFG(key, currNode);
+        checkValidKey(key);
+
+        TFNode currNode = treeRoot; // WE DON'T NEED TO USE THE .ROOT() FUNCTION RIGHT?
         Item item = new Item(key, element);
+        int idx = findFG(key, currNode);
 
         while (currNode.getChild(idx) != null) {
             currNode = currNode.getChild(idx);
             
             idx = findFG(key, currNode);
-            // TODO: check for cases when there are duplicate keys
-            // if (currNode.getItem(idx).key() == key);
-            
+
+            // Handling duplicates
+            if (currNode.getItem(idx).key() == key) { // DON'T DOUBLE DEREFERENCE
+                if (currNode.getChild(idx) != null) {
+                    // Finding the in-order successor
+                    currNode = currNode.getChild(idx + 1);
+                    // keep going left until you reach last child
+                    while (currNode.getChild(0) != null) {
+                        currNode = currNode.getChild(0);
+                    }
+                    break;
+                }
+            }
         }
 
         currNode.insertItem(idx, item);
+
+        // Check for overflow
+        if (currNode.getNumItems() == 4) {
+            fixOverflow(currNode);
+        }
     }
 
     /**
@@ -99,7 +204,28 @@ public class TwoFourTree implements Dictionary {
      * @exception ElementNotFoundException if the key is not in dictionary
      */
     public Object removeElement(Object key) throws ElementNotFoundException {
-        return null;
+        checkValidKey(key);
+
+        if (findElement(key) == null) { // Make sure it exists before we find it to remove
+            throw new ElementNotFoundException();
+        }
+
+        TFNode currNode = treeRoot;
+        int idx = -1;
+
+        while (currNode != null) {
+            idx = findFG(key, currNode);
+            if (currNode.getItem(idx).key() == key) { // Don't double dereference
+                currNode.removeItem(idx);
+                if (currNode.getNumItems() == 0) {
+                    fixUnderflow(currNode);
+                }
+                break;
+            }
+            currNode = currNode.getChild(idx);
+        }
+
+        return findElement(key);
     }
 
     public static void main(String[] args) {
