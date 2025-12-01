@@ -37,8 +37,6 @@ public class TwoFourTree implements Dictionary {
         return (size == 0);
     }
     
-    // DON'T PANIC WE'RE SUPPOSED TO HAVE A LOT OF SUBROUTINES FOR READABILITY AND WHATNOT
-    // ...
     public void checkValidKey(Object key) {
         if (treeComp.isComparable(key)) return;
 
@@ -57,79 +55,163 @@ public class TwoFourTree implements Dictionary {
         return parent.getNumItems();
     }
 
-    public boolean canDoLeftTransfer(TFNode curr) { // I FEEL LIKE THIS MIGHT BE TOO VERBOSE BUT WE CAN FIX IT LATER
-        int childNum = whatChild(curr);
-        if (childNum == 0) return false;
+    public boolean leftTransferPossible(TFNode curr) {
+        if (curr == root()) return false;
 
         TFNode parent = curr.getParent();
+        int childIdx = whatChild(curr);
+
+        if (childIdx > parent.getNumItems() - 1) return false;
+
+        // I need to double-check if he expects left transfer ONLY from right sibling or if expected from 'righter' siblings too.
+        for (int i = childIdx + 1; i <= parent.getNumItems(); i++) {
+            TFNode sibling = parent.getChild(i);
+            if (sibling.getNumItems() > 1) return true;
+        }
+
+        return false;
+    }
+
+    public boolean rightTransferPossible(TFNode curr) {
+        if (curr == root()) return false;
+
+        TFNode parent = curr.getParent();
+        int childIdx = whatChild(curr);
+
+        if (childIdx == 0) return false;
+
+        // same comment from above [left].
+        for (int i = childIdx - 1; i >= 0; i--) {
+            TFNode sibling = parent.getChild(i);
+            if (sibling.getNumItems() > 1) return true;
+        }
+
+        return false;
+    }
+
+    public boolean leftFusionPossible(TFNode curr) {
+        TFNode parent = curr.getParent();
+        int childNum = whatChild(curr);
         TFNode leftSib = parent.getChild(childNum - 1);
+        int sibNumItems = leftSib.getNumItems();
 
-        if (leftSib.getNumItems() <= 1) return false;
-
-        return true;
+        return (sibNumItems == 1);
     }
 
-    public boolean canDoRightTransfer(TFNode temp) {
-        int childNum = whatChild(temp);
-        TFNode parent = temp.getParent();
+    public void leftTransfer(TFNode curr) {
+        TFNode parent = curr.getParent();
+        int childIdx = whatChild(curr);
+        TFNode rightSib = parent.getChild(childIdx + 1);
+        Item parItem = parent.getItem(0);
 
-        if (parent.getNumItems() == childNum) return false;
-
-        TFNode rightSib = parent.getChild(childNum + 1);
-        if (rightSib.getNumItems() <= 1) return false;
-
-        return true;
+        curr.addItem(0, parItem);
+        parent.replaceItem(0, rightSib.getItem(0));
+        rightSib.removeItem(0);
     }
 
-    public boolean canDoLeftFusion(TFNode temp) {
-        int childNum = whatChild(temp);
-        if (childNum == 0) return false;
+    public void rightTransfer(TFNode curr) {
+        TFNode parent = curr.getParent();
+        int childIdx = whatChild(curr);
+        // TFNode leftSib = parent.getChild(childIdx - 1);
+        Item parItem = parent.getItem(childIdx - 1);
 
-        return true;
+        curr.addItem(1, parItem);
+        parent.removeItem(childIdx - 1);
+        // parent.insertItem(0, leftSib.getItem(leftSib.getNumItems()));
+        // leftSib.removeItem(leftSib.getNumItems());
     }
 
-    public void leftTransfer() {
-        //TODO: implement
+    public void leftFusion(TFNode curr) {
+        TFNode parent = curr.getParent();
+        int childIdx = whatChild(curr);
+        TFNode left = parent.getChild(childIdx - 1);
+        Item parItem = parent.getItem(0);
+        
+        rightSib.insertItem(0, parItem);
+        parent.removeItem(0);
+        // unclear of what to do here (i wrote rightFusion first so pretend its the left version):
+        // leftSib.setChild(leftSib.getNumItems(), curr.getChild(0));
     }
 
-    public void rightTransfer() {
-        //TODO: implement
+    public void rightFusion(TFNode curr) {
+        TFNode parent = curr.getParent();
+        int childIdx = whatChild(curr);
+        TFNode leftSib = parent.getChild(childIdx - 1);
+        Item parItem = parent.getItem(parent.getNumItems());
+
+        leftSib.addItem(1, parItem);
+        parent.removeItem(parent.getNumItems());
+        // unclear of what to do here:
+        // leftSib.setChild(leftSib.getNumItems(), curr.getChild(0));
     }
 
-    public void leftFusion() {
-        //TODO: implement
-    }
-
-    public void rightFusion() {
-        //TODO: implement
-    }
-
-    // PLEASE DON'T CHANGE ANYTHING UNTIL WE CAN TALK ABOUT IT
-    // OR AT LEAST JUST COMMENT OUT MY CODE IF YOU DO CHANGE ANYTHING
-    // okay but why did you change things you weren't supposed to? without communicating? I had/have changes I haven't pushed yet...
     public void fixUnderflow(TFNode curr) {
-        if (canDoLeftTransfer(curr)) {
-            leftTransfer();
+        if (leftTransferPossible(curr)) {
+            leftTransfer(curr);
             return;
         }
 
-        else if (canDoRightTransfer(curr)) {
-            rightTransfer();
+        else if (rightTransferPossible(curr)) {
+            rightTransfer(curr);
             return;
         }
 
-        else if (canDoLeftFusion(curr)) {
-            leftFusion();
+        else if (leftFusionPossible(curr)) {
+            leftFusion(curr);
             return;
         }
+        
         else {
-            rightFusion();
+            rightFusion(curr);
             return;
         }
     }
 
     public void fixOverflow(TFNode curr) {
-        //TODO: implement
+        if (curr == root()) {
+            TFNode newRoot = new TFNode();
+            Item rootItem = curr.getItem(2);
+
+            newRoot.addItem(0, rootItem);
+            setRoot(newRoot);
+            newRoot.setChild(0, curr);
+
+            curr.removeItem(2);
+
+            TFNode newChild = new TFNode();
+            Item childItem = curr.getItem(2);
+
+            curr.setParent(newRoot);
+            newChild.setParent(newRoot);
+            
+            newChild.addItem(0, childItem);
+            newRoot.setChild(1, newChild);
+            curr.removeItem(2);
+            
+            newChild.setChild(0, curr.getChild(3));
+            TFNode child0 = newChild.getChild(0);
+            child0.setParent(newChild);
+            newChild.setChild(1, curr.getChild(4));
+            TFNode child1 = newChild.getChild(1);
+            child1.setParent(newChild);
+        } else {
+            TFNode parent = curr.getParent();
+            int childIdx = whatChild(curr);
+            Item item = curr.getItem(2);
+            int parentIdx = findFG(item, parent);
+            
+            parent.insertItem(parentIdx, item);
+            curr.removeItem(2);
+
+            TFNode newChild = new TFNode();
+            Item childItem = curr.getItem(2);
+            
+            for (int i = parent.getNumItems(); i > childIdx + 1; i--) parent.setChild(i, parent.getChild(i - 1));
+
+            newChild.addItem(0, childItem);
+            parent.setChild(childIdx + 1, newChild);
+            curr.removeItem(2);
+        }
     }
 
     /**
@@ -178,8 +260,18 @@ public class TwoFourTree implements Dictionary {
     public void insertElement(Object key, Object element) {
         checkValidKey(key);
 
-        TFNode currNode = treeRoot;
+        TFNode currNode = new TFNode();
         Item item = new Item(key, element);
+        
+        // checks if no root yet. actually i misread the code lol this might be redundant but let's leave it in for 'robustness'...
+        if (root() == null) {
+            currNode.addItem(0, item);
+            setRoot(currNode);
+            return;
+        }
+
+        // if not root, continue
+        currNode = root();
         int idx = findFG(key, currNode);
 
         while (currNode.getChild(idx) != null) {
@@ -205,7 +297,10 @@ public class TwoFourTree implements Dictionary {
         currNode.insertItem(idx, item);
 
         // Check for overflow
-        if (currNode.getNumItems() == 4) fixOverflow(currNode);
+        while (currNode.getNumItems() == 4) {
+            fixOverflow(currNode);
+            currNode = currNode.getParent();
+        }
     }
 
     /**
