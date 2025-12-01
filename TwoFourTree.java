@@ -194,6 +194,7 @@ public class TwoFourTree implements Dictionary {
             newChild.setChild(1, curr.getChild(4));
             TFNode child1 = newChild.getChild(1);
             child1.setParent(newChild);
+            
         } else {
             TFNode parent = curr.getParent();
             int childIdx = whatChild(curr);
