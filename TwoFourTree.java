@@ -121,7 +121,7 @@ public class TwoFourTree implements Dictionary {
         // leftSib.removeItem(leftSib.getNumItems());
     }
 
-    public void leftFusion(TFNode curr) {
+    public void leftFusion(TFNode curr) { //SOMETHING IS MESSED UP WITH LEFT FUSION AND RIGHT FUSION
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
         TFNode left = parent.getChild(childIdx - 1);
@@ -167,7 +167,7 @@ public class TwoFourTree implements Dictionary {
         }
     }
 
-    public void fixOverflow(TFNode curr) {
+    public void fixOverflow(TFNode curr) { // WE SHOULD DEFINITELY MAKE SOME SUBROUTINES
         if (curr == root()) {
             TFNode newRoot = new TFNode();
             Item rootItem = curr.getItem(2);
@@ -194,7 +194,6 @@ public class TwoFourTree implements Dictionary {
             newChild.setChild(1, curr.getChild(4));
             TFNode child1 = newChild.getChild(1);
             child1.setParent(newChild);
-            
         } else {
             TFNode parent = curr.getParent();
             int childIdx = whatChild(curr);
@@ -316,7 +315,8 @@ public class TwoFourTree implements Dictionary {
 
         if (findElement(key) == null) throw new ElementNotFoundException();
 
-        TFNode currNode = treeRoot;
+        Object toReturn = findElement(key);
+        TFNode currNode = root();
         int idx = -1;
 
         while (currNode != null) {
@@ -324,7 +324,25 @@ public class TwoFourTree implements Dictionary {
             Item currItem = currNode.getItem(idx);
 
             if (currItem.key() == key) {
-                currNode.removeItem(idx);
+                if (currNode.getChild(0) == null) currNode.removeItem(idx); // at a leaf
+
+                // else at internal node
+                currNode.deleteItem(idx);
+
+                //Make a copy of currNode to iterate through in order to find in order successor
+                TFNode downNode = currNode;
+
+                // Finding the in-order successor
+                downNode = downNode.getChild(idx + 1);
+
+                // keep going left until you reach last child
+                while (downNode.getChild(0) != null) downNode = downNode.getChild(0);
+
+                Item successor = downNode.getItem(0);
+                currNode.addItem(idx, successor);
+                downNode.removeItem(0);
+                fixUnderflow(downNode);
+
                 if (currNode.getNumItems() == 0) {
                     fixUnderflow(currNode);
                 }
@@ -334,7 +352,7 @@ public class TwoFourTree implements Dictionary {
             currNode = currNode.getChild(idx);
         }
 
-        return findElement(key);
+        return toReturn;
     }
 
     public static void main(String[] args) {
