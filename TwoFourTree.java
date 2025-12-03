@@ -175,7 +175,7 @@ public class TwoFourTree implements Dictionary {
         }
     }
 
-    public void fixOverflow(TFNode curr) { // WE SHOULD DEFINITELY MAKE SOME SUBROUTINES
+    public void fixOverflow(TFNode curr) {
         if (curr == root()) {
             TFNode newRoot = new TFNode();
             Item rootItem = curr.getItem(2);
