@@ -120,27 +120,34 @@ public class TwoFourTree implements Dictionary {
         leftSib.removeItem(leftSib.getNumItems() - 1);
     }
 
-    public void leftFusion(TFNode curr) { //SOMETHING IS MESSED UP WITH LEFT FUSION AND RIGHT FUSION
+    public void leftFusion(TFNode curr) {
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
-        TFNode left = parent.getChild(childIdx - 1);
-        Item parItem = parent.getItem(0);
-        
-        rightSib.insertItem(0, parItem);
-        parent.removeItem(0);
-        // unclear of what to do here (i wrote rightFusion first so pretend its the left version):
-        // leftSib.setChild(leftSib.getNumItems(), curr.getChild(0));
+        int parentIdx = childIdx - 1;
+        TFNode leftSib = parent.getChild(parentIdx);
+        Item parItem = parent.getItem(parentIdx);
+        TFNode child = curr.getChild(0);
+
+        leftSib.insertItem(1, parItem);
+        leftSib.setChild(2, child);
+        child.setParent(curr);
+
+        parent.removeItem(parentIdx);
     }
 
     public void rightFusion(TFNode curr) {
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
-        TFNode rightSib = parent.getChild(childIdx + 1);
-        Item parItem = parent.getItem(parent.getNumItems());
+        int parentIdx = childIdx + 1;
+        TFNode rightSib = parent.getChild(parentIdx);
+        Item parItem = parent.getItem(childIdx);
+        TFNode child = curr.getChild(0);
 
         rightSib.insertItem(0, parItem);
-        rightSib.setChild(0, curr.getChild(0));
-        parent.removeItem(parent.getNumItems());
+        rightSib.setChild(0, child);
+        child.setParent(curr);
+
+        parent.removeItem(parentIdx);
     }
 
     public void fixUnderflow(TFNode curr) {
