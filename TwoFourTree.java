@@ -341,10 +341,15 @@ public class TwoFourTree implements Dictionary {
                 Item successor = downNode.getItem(0);
                 currNode.addItem(idx, successor);
                 downNode.removeItem(0);
-                fixUnderflow(downNode);
 
-                if (currNode.getNumItems() == 0) {
+                while (downNode != currNode && downNode.getNumItems() == 0) {
+                    fixUnderflow(downNode);
+                    downNode = downNode.getParent();
+                }
+
+                while (currNode.getNumItems() == 0) {
                     fixUnderflow(currNode);
+                    currNode = currNode.getParent();
                 }
                 break;
             }
