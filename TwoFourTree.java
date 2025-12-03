@@ -128,11 +128,13 @@ public class TwoFourTree implements Dictionary {
         Item parItem = parent.getItem(parentIdx);
         TFNode child = curr.getChild(0);
 
-        leftSib.insertItem(1, parItem);
+        leftSib.insertItem(leftSib.getNumItems(), parItem);
         leftSib.setChild(2, child);
-        child.setParent(curr);
+        child.setParent(leftSib);
 
         parent.removeItem(parentIdx);
+        parent.setChild(parentIdx, leftSib);
+        leftSib.setParent(parent);
     }
 
     public void rightFusion(TFNode curr) {
@@ -144,8 +146,9 @@ public class TwoFourTree implements Dictionary {
         TFNode child = curr.getChild(0);
 
         rightSib.insertItem(0, parItem);
+        // for (int i = rightSib.getNumItems(); i > 0; i--) rightSib.setChild(i, rightSib.getChild(i - 1));
         rightSib.setChild(0, child);
-        child.setParent(curr);
+        child.setParent(rightSib);
 
         parent.removeItem(parentIdx);
     }
