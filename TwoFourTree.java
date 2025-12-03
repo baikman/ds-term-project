@@ -112,13 +112,12 @@ public class TwoFourTree implements Dictionary {
     public void rightTransfer(TFNode curr) {
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
-        // TFNode leftSib = parent.getChild(childIdx - 1);
+        TFNode leftSib = parent.getChild(childIdx - 1);
         Item parItem = parent.getItem(childIdx - 1);
 
-        curr.addItem(1, parItem);
-        parent.removeItem(childIdx - 1);
-        // parent.insertItem(0, leftSib.getItem(leftSib.getNumItems()));
-        // leftSib.removeItem(leftSib.getNumItems());
+        curr.addItem(0, parItem);
+        parent.replaceItem(childIdx - 1, leftSib.getItem(leftSib.getNumItems() - 1));
+        leftSib.removeItem(leftSib.getNumItems() - 1);
     }
 
     public void leftFusion(TFNode curr) { //SOMETHING IS MESSED UP WITH LEFT FUSION AND RIGHT FUSION
@@ -136,10 +135,11 @@ public class TwoFourTree implements Dictionary {
     public void rightFusion(TFNode curr) {
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
-        TFNode leftSib = parent.getChild(childIdx - 1);
+        TFNode rightSib = parent.getChild(childIdx + 1);
         Item parItem = parent.getItem(parent.getNumItems());
 
-        leftSib.addItem(1, parItem);
+        rightSib.insertItem(0, parItem);
+        rightSib.setChild(0, curr.getChild(0));
         parent.removeItem(parent.getNumItems());
         // unclear of what to do here:
         // leftSib.setChild(leftSib.getNumItems(), curr.getChild(0));
