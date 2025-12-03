@@ -141,8 +141,6 @@ public class TwoFourTree implements Dictionary {
         rightSib.insertItem(0, parItem);
         rightSib.setChild(0, curr.getChild(0));
         parent.removeItem(parent.getNumItems());
-        // unclear of what to do here:
-        // leftSib.setChild(leftSib.getNumItems(), curr.getChild(0));
     }
 
     public void fixUnderflow(TFNode curr) {
