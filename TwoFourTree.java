@@ -221,8 +221,8 @@ public class TwoFourTree implements Dictionary {
             curr.deleteItem(2);
 
             // fix children
-            for (int i = parent.getNumItems(); i > childIdx + 1; i--) {
-                parent.setChild(i, parent.getChild(i - 1));
+            for (int i = curr.getNumItems(); i > childIdx + 1; i--) {
+                curr.setChild(i, curr.getChild(i - 1));
             }
             newChild.addItem(0, childItem);
             parent.setChild(childIdx + 1, newChild);
