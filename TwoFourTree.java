@@ -184,41 +184,49 @@ public class TwoFourTree implements Dictionary {
             setRoot(newRoot);
             newRoot.setChild(0, curr);
 
-            curr.removeItem(2);
+            //curr.deleteItem(2);
 
             TFNode newChild = new TFNode();
-            Item childItem = curr.getItem(2);
+            Item childItem = curr.getItem(3);
+            
 
             curr.setParent(newRoot);
             newChild.setParent(newRoot);
             
             newChild.addItem(0, childItem);
             newRoot.setChild(1, newChild);
-            curr.removeItem(2);
-            
+            curr.deleteItem(3);
+            curr.deleteItem(2);
+
             newChild.setChild(0, curr.getChild(3));
             TFNode child0 = newChild.getChild(0);
-            child0.setParent(newChild);
+            
             newChild.setChild(1, curr.getChild(4));
             TFNode child1 = newChild.getChild(1);
-            child1.setParent(newChild);
+            if (child0 != null) {
+                child0.setParent(newChild);
+                child1.setParent(newChild);
+            }
         } else {
             TFNode parent = curr.getParent();
             int childIdx = whatChild(curr);
             Item item = curr.getItem(2);
-            int parentIdx = findFG(item, parent);
+            // int parentIdx = findFG(item, parent);
             
-            parent.insertItem(parentIdx, item);
-            curr.removeItem(2);
+            parent.insertItem(childIdx, item);
 
             TFNode newChild = new TFNode();
-            Item childItem = curr.getItem(2);
-            
-            for (int i = parent.getNumItems(); i > childIdx + 1; i--) parent.setChild(i, parent.getChild(i - 1));
+            Item childItem = curr.getItem(3);
+            curr.deleteItem(3);
+            curr.deleteItem(2);
 
+            // fix children
+            for (int i = parent.getNumItems(); i > childIdx + 1; i--) {
+                parent.setChild(i, parent.getChild(i - 1));
+            }
             newChild.addItem(0, childItem);
             parent.setChild(childIdx + 1, newChild);
-            curr.removeItem(2);
+            newChild.setParent(parent);
         }
     }
 
@@ -267,7 +275,7 @@ public class TwoFourTree implements Dictionary {
      */
     public void insertElement(Object key, Object element) {
         checkValidKey(key);
-
+        
         TFNode currNode = new TFNode();
         Item item = new Item(key, element);
         
@@ -286,18 +294,21 @@ public class TwoFourTree implements Dictionary {
             currNode = currNode.getChild(idx);
             
             idx = findFG(key, currNode);
-            Item currItem = currNode.getItem(idx);
 
-            // Handling duplicates
-            if (currItem.key() == key) {
-                if (currNode.getChild(idx) != null) {
-                    // Finding the in-order successor
-                    currNode = currNode.getChild(idx + 1);
+            if (currNode.getNumItems() < idx) {
+                Item currItem = currNode.getItem(idx);
 
-                    // keep going left until you reach last child
-                    while (currNode.getChild(0) != null) currNode = currNode.getChild(0);
+                // Handling duplicates
+                if (currItem.key() == key) {
+                    if (currNode.getChild(idx) != null) {
+                        // Finding the in-order successor
+                        currNode = currNode.getChild(idx + 1);
 
-                    break;
+                        // keep going left until you reach last child
+                        while (currNode.getChild(0) != null) currNode = currNode.getChild(0);
+
+                        break;
+                    }
                 }
             }
         }
