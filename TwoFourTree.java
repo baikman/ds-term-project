@@ -65,7 +65,6 @@ public class TwoFourTree implements Dictionary {
 
         if (childIdx > parent.getNumItems() - 1) return false;
 
-        // I need to double-check if he expects left transfer ONLY from right sibling or if expected from 'righter' siblings too.
         TFNode sibling = parent.getChild(childIdx + 1);
         return (sibling.getNumItems() > 1);
     }
@@ -78,13 +77,8 @@ public class TwoFourTree implements Dictionary {
 
         if (childIdx == 0) return false;
 
-        // same comment from above [left].
-        for (int i = childIdx - 1; i >= 0; i--) {
-            TFNode sibling = parent.getChild(i);
-            if (sibling.getNumItems() > 1) return true;
-        }
-
-        return false;
+        TFNode sibling = parent.getChild(childIdx - 1);
+        return (sibling.getNumItems() > 1);
     }
 
     public boolean leftFusionPossible(TFNode curr) {
