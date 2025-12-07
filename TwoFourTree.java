@@ -231,22 +231,28 @@ public class TwoFourTree implements Dictionary {
             TFNode parent = curr.getParent();
             int childIdx = whatChild(curr);
             Item item = curr.getItem(2);
-            // int parentIdx = findFG(item, parent);
             
             parent.insertItem(childIdx, item);
 
             TFNode newChild = new TFNode();
             Item childItem = curr.getItem(3);
-            curr.deleteItem(3);
-            curr.deleteItem(2);
 
-            // fix children
-            for (int i = curr.getNumItems(); i > childIdx + 1; i--) {
-                curr.setChild(i, curr.getChild(i - 1));
-            }
             newChild.addItem(0, childItem);
             parent.setChild(childIdx + 1, newChild);
             newChild.setParent(parent);
+
+            newChild.setChild(0, curr.getChild(3));
+            TFNode child0 = newChild.getChild(0);
+            
+            newChild.setChild(1, curr.getChild(4));
+            TFNode child1 = newChild.getChild(1);
+            if (child0 != null) {
+                child0.setParent(newChild);
+                child1.setParent(newChild);
+            }
+
+            curr.deleteItem(3);
+            curr.deleteItem(2);
         }
     }
 
@@ -273,7 +279,7 @@ public class TwoFourTree implements Dictionary {
     public Object findElement(Object key) {
         checkValidKey(key);
         
-        TFNode currNode = treeRoot;
+        TFNode currNode = root();
         int idx = -1;
 
         while (currNode != null) {
@@ -388,12 +394,13 @@ public class TwoFourTree implements Dictionary {
                 }
 
                 while (currNode.getNumItems() == 0) {
-                    if (currNode == root()) {
+                    if (currNode == root() && currNode.getChild(0) == null) return toReturn;
+                    else if (currNode == root()) {
                         fixUnderflow(currNode);
                         break;
                     }
                     fixUnderflow(currNode);
-                    if (currNode.getParent() != null) currNode = currNode.getParent();
+                    if (currNode.getParent() != null && currNode != root()) currNode = currNode.getParent();
                 }
 
                 break;
@@ -473,27 +480,32 @@ public class TwoFourTree implements Dictionary {
 
         myTree = new TwoFourTree(myComp);
 
-        final int TEST_SIZE = 25;
-
-        for (int i = 0; i < TEST_SIZE; i++) {
-            myTree.insertElement(i, i);
-            //myTree.printTree(myTree.root(), 0);
-            //          myTree.printAllElements();
-            //         myTree.checkTree();
-        }
-
-        System.out.println("removing");
-        for (int i = 0; i < TEST_SIZE; i++) {
-            int out = (Integer) myTree.removeElement(i);
-            //myTree.root();
-            myTree.checkTree();
-            System.out.println(out);
-            if (out != i) {
-                throw new TwoFourTreeException("main: wrong element removed");
+        for (int TEST_SIZE = 129; TEST_SIZE < 130; TEST_SIZE++) {
+            System.out.println("adding " + TEST_SIZE);
+            for (int i = 0; i < TEST_SIZE; i++) {
+                myTree.insertElement(i, i);
+                myTree.checkTree();
+                myTree.printAllElements();
+                System.out.println();
             }
-            // if (i > TEST_SIZE - 15) myTree.printAllElements();
+
+            myTree.printAllElements();
+
+            System.out.println("removing");
+            for (int i = 0; i < TEST_SIZE; i++) {
+                System.out.println("Removing " + i);
+                int out = (Integer) myTree.removeElement(i);
+                System.out.println("removed " + out);
+                myTree.checkTree();
+                if (i > 125) {
+                    System.out.println(myTree.root().getNumItems());
+                    myTree.printAllElements();
+                }
+                if (out != i) throw new TwoFourTreeException("main: wrong element removed");
+                System.out.println();
+            }
+            System.out.println("done");
         }
-        System.out.println("done");
     }
 
     public void printAllElements() {
