@@ -103,7 +103,6 @@ public class TwoFourTree implements Dictionary {
         if (sibChild != null) sibChild.setParent(curr);
         curr.setChild(1, sibChild);
         rightSib.removeItem(0);
-
     }
 
     public void rightTransfer(TFNode curr) {
@@ -163,10 +162,12 @@ public class TwoFourTree implements Dictionary {
         if (curr == root()) {
             if (curr.getChild(0) == null) {
                setRoot(curr.getChild(1));
+               curr.getChild(1).setParent(null);
                return;
             }
-                setRoot(curr.getChild(0));
-                return;
+            setRoot(curr.getChild(0));
+            curr.getChild(0).setParent(null);
+            return;
         }
         /*if (curr.getNumItems() == 0 && curr.getChild(0) != null) {
             if (curr.getChild(0).getNumItems() == 0) {
@@ -282,13 +283,17 @@ public class TwoFourTree implements Dictionary {
         TFNode currNode = root();
         int idx = -1;
 
+        printTFNode(currNode);
+
+        //if (currNode.getItem(0).key() == (Object) 128) return (Object) 128;
+
         while (currNode != null) {
             idx = findFG(key, currNode);
             if (currNode.getNumItems() > idx) {
                 Item currItem = currNode.getItem(idx);
                 if (currItem.key() == key) return currItem.element();
             }
-
+ 
             currNode = currNode.getChild(idx);
         }
 
@@ -306,7 +311,6 @@ public class TwoFourTree implements Dictionary {
         TFNode currNode = new TFNode();
         Item item = new Item(key, element);
         
-        // checks if no root yet. actually i misread the code lol this might be redundant but let's leave it in for 'robustness'...
         if (root() == null) {
             currNode.addItem(0, item);
             setRoot(currNode);
@@ -485,12 +489,11 @@ public class TwoFourTree implements Dictionary {
             for (int i = 0; i < TEST_SIZE; i++) {
                 myTree.insertElement(i, i);
                 myTree.checkTree();
-                myTree.printAllElements();
+                //myTree.printAllElements();
                 System.out.println();
             }
 
             myTree.printAllElements();
-
             System.out.println("removing");
             for (int i = 0; i < TEST_SIZE; i++) {
                 System.out.println("Removing " + i);
