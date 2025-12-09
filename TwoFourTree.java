@@ -101,7 +101,9 @@ public class TwoFourTree implements Dictionary {
     public boolean leftFusionPossible(TFNode curr) {
         TFNode parent = curr.getParent();
         int childNum = whatChild(curr);
+
         if (childNum == 0) return false;
+
         TFNode leftSib = parent.getChild(childNum - 1);
         int sibNumItems = leftSib.getNumItems();
 
@@ -112,28 +114,21 @@ public class TwoFourTree implements Dictionary {
      * @param node to perform left transfer on
      */
     public void leftTransfer(TFNode curr) {
-        /*TFNode parent = curr.getParent();
-        int childIdx = whatChild(curr);
-        TFNode rightSib = parent.getChild(childIdx + 1);
-        Item parItem = parent.getItem(0);
-        TFNode sibChild = rightSib.getChild(0);
-
-        curr.addItem(0, parItem);
-        parent.replaceItem(0, rightSib.getItem(0));
-        if (sibChild != null) sibChild.setParent(curr);
-        curr.setChild(1, sibChild);
-        rightSib.removeItem(0);*/
-
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
         TFNode rightSib = parent.getChild(childIdx + 1);
-        Item parItem = parent.getItem(1);
-        TFNode sibChild = rightSib.getChild(0);
+        Item parItem = parent.getItem(0);
 
         curr.addItem(0, parItem);
-        parent.replaceItem(1, rightSib.getItem(0));
-        if (sibChild != null) sibChild.setParent(curr);
-        curr.setChild(1, sibChild);
+        parent.replaceItem(0, rightSib.getItem(0));
+
+        TFNode sibChild = rightSib.getChild(0);
+
+        if (sibChild != null) {
+            curr.setChild(1, sibChild);
+            sibChild.setParent(curr);
+        }
+
         rightSib.removeItem(0);
     }
 
@@ -145,15 +140,19 @@ public class TwoFourTree implements Dictionary {
         int childIdx = whatChild(curr);
         TFNode leftSib = parent.getChild(childIdx - 1);
         Item parItem = parent.getItem(childIdx - 1);
-        TFNode sibChild = leftSib.getChild(leftSib.getNumItems());
 
         curr.addItem(0, parItem);
         parent.replaceItem(childIdx - 1, leftSib.getItem(leftSib.getNumItems() - 1));
-        if (sibChild != null) sibChild.setParent(curr);
-        curr.setChild(1,curr.getChild(0));
-        curr.setChild(0, sibChild);
-        leftSib.deleteItem(leftSib.getNumItems() - 1);
-        //leftSib.setChild(leftSib.getNumItems(), null); // Unnecessary but just for cleanup
+
+        TFNode sibChild = leftSib.getChild(leftSib.getNumItems());
+
+        if (sibChild != null) {
+            curr.setChild(1, curr.getChild(0));
+            curr.setChild(0, sibChild);
+            sibChild.setParent(curr);
+        }
+        
+        leftSib.removeItem(leftSib.getNumItems() - 1);
     }
 
     /**
@@ -165,17 +164,17 @@ public class TwoFourTree implements Dictionary {
         int parentIdx = childIdx - 1;
         TFNode leftSib = parent.getChild(parentIdx);
         Item parItem = parent.getItem(parentIdx);
-        TFNode child = curr.getChild(0);
 
         leftSib.insertItem(leftSib.getNumItems(), parItem);
-        leftSib.setChild(2, child);
-        if (child != null) child.setParent(leftSib);
+
+        TFNode child = curr.getChild(0);
+        
+        if (child != null) {
+            leftSib.setChild(2, child);
+            child.setParent(leftSib);
+        }
 
         parent.removeItem(parentIdx);
-        //if (parent == null) {
-         //   setRoot(leftSib);
-         //   return;
-        //} 
         parent.setChild(parentIdx, leftSib);
         leftSib.setParent(parent);
     }
@@ -189,15 +188,17 @@ public class TwoFourTree implements Dictionary {
         int parentIdx = childIdx + 1;
         TFNode rightSib = parent.getChild(parentIdx);
         Item parItem = parent.getItem(childIdx);
-        TFNode child = curr.getChild(0);
-
+        
         rightSib.insertItem(0, parItem);
-        // for (int i = rightSib.getNumItems(); i > 0; i--) rightSib.setChild(i, rightSib.getChild(i - 1));
-        rightSib.setChild(0, child);
-        if (child != null) child.setParent(rightSib);
+
+        TFNode child = curr.getChild(0);
+        
+        if (child != null) {
+            rightSib.setChild(0, child);
+            child.setParent(rightSib);
+        }
 
         parent.removeItem(childIdx);
-        //if (parent == null) setRoot(rightSib);
     }
 
     /**
@@ -282,7 +283,8 @@ public class TwoFourTree implements Dictionary {
                 child0.setParent(newChild);
                 child1.setParent(newChild);
             }
-        } else {
+        }
+        else {
             TFNode parent = curr.getParent();
             int childIdx = whatChild(curr);
             Item item = curr.getItem(2);
@@ -312,7 +314,6 @@ public class TwoFourTree implements Dictionary {
     }
 
     /**
-     * 
      * @param key to be searched for
      * @return object corresponding to key; null if not found
      */
@@ -367,7 +368,6 @@ public class TwoFourTree implements Dictionary {
             return;
         }
 
-        // if not root, continue
         currNode = root();
         int idx = findFG(key, currNode);
 
@@ -380,12 +380,12 @@ public class TwoFourTree implements Dictionary {
                 Item currItem = currNode.getItem(idx);
 
                 // Handling duplicates
-                if (currItem.key() == key) {
+                if (treeComp.isEqual(currItem.key(), key)) {
                     if (currNode.getChild(idx) != null) {
                         // Finding the in-order successor
                         currNode = currNode.getChild(idx + 1);
 
-                        // keep going left until you reach last child
+                        // Keep going left until you reach last child
                         while (currNode.getChild(0) != null) currNode = currNode.getChild(0);
 
                         break;
@@ -401,6 +401,8 @@ public class TwoFourTree implements Dictionary {
             fixOverflow(currNode);
             currNode = currNode.getParent();
         }
+
+        size++;
     }
 
     /**
@@ -413,7 +415,7 @@ public class TwoFourTree implements Dictionary {
     public Object removeElement(Object key) throws ElementNotFoundException {
         checkValidKey(key);
 
-        if (findElement(key) == null) throw new ElementNotFoundException();
+        if (findElement(key) == null) throw new ElementNotFoundException("Element not found");
 
         Object toReturn = findElement(key);
         TFNode currNode = root();
@@ -426,49 +428,36 @@ public class TwoFourTree implements Dictionary {
 
                 if (treeComp.isEqual(currItem.key(), key)) {
                     if (currNode.getChild(0) == null) {
-                        currNode.removeItem(idx); // at a leaf
+                        currNode.removeItem(idx);
                         if (currNode.getNumItems() == 0) {
-                        if (currNode == root() && currNode.getChild(0) == null) return toReturn;
-                        else if (currNode == root()) {
+                            if (currNode == root() && currNode.getChild(0) == null) {
+                                return toReturn;
+                            }
+                            else if (currNode == root()) {
+                                fixUnderflow(currNode);
+                                break;
+                            }
                             fixUnderflow(currNode);
-                            break;
+                            if (currNode.getParent() != null && currNode != root()) currNode = currNode.getParent();
                         }
-                        fixUnderflow(currNode);
-                        if (currNode.getParent() != null && currNode != root()) currNode = currNode.getParent();
                     }
-                    } 
-                    
                     else  {
-                        currNode.deleteItem(idx); // else at internal node
-
-                        //Make a copy of currNode to iterate through in order to find in order successor
                         TFNode downNode = currNode;
 
-                        // Finding the in-order successor
+                        // Find the in-order successor
                         downNode = downNode.getChild(idx + 1);
 
-                        // keep going left until you reach last child
+                        // Keep going left until you reach last child
                         while (downNode.getChild(0) != null) downNode = downNode.getChild(0);
 
                         Item successor = downNode.getItem(0);
-                        currNode.addItem(idx, successor);
+                        currNode.replaceItem(idx, successor);
                         downNode.removeItem(0);
 
                         if (downNode.getNumItems() == 0) {
                             fixUnderflow(downNode);
-                            //downNode = downNode.getParent();
                         }
                     }
-
-                    /*if (currNode.getNumItems() == 0) {
-                        if (currNode == root() && currNode.getChild(0) == null) return toReturn;
-                        else if (currNode == root()) {
-                            fixUnderflow(currNode);
-                            break;
-                        }
-                        fixUnderflow(currNode);
-                        if (currNode.getParent() != null && currNode != root()) currNode = currNode.getParent();
-                    }*/
 
                     break;
                 }
@@ -553,42 +542,28 @@ public class TwoFourTree implements Dictionary {
         Random rand = new Random(2);
 
         System.out.println("adding " + TEST_SIZE);
+
         for (int i = 0; i < TEST_SIZE; i++) {
             int num = rand.nextInt(TEST_SIZE);
             nums[i] = num;
             
-            /*for (int i = 0; i < TEST_SIZE; i++) {
-                myTree.insertElement(i, i);
-                myTree.checkTree();
-                //myTree.printAllElements();
-                // System.out.println();
-            }*/
             myTree.insertElement(num, num);
             myTree.checkTree();
-            //myTree.printAllElements();
-
-            myTree.printAllElements();
         }
 
-            System.out.println("removing");
-            for (int i = 0; i < TEST_SIZE; i++) {
-                System.out.println("Removing " + nums[i]);
-                 if (nums[i] == 15) {
-                     int z = 0;
-                }
-                // myTree.printAllElements();
-                int out = (Integer) myTree.removeElement(nums[i]);
-                System.out.println("removed " + out);
-                myTree.checkTree();
-                myTree.printAllElements();
-                // if (i > 125) {
-                //     // System.out.println(myTree.root().getNumItems());
-                //     myTree.printAllElements();
-                // }
-                if (out != nums[i]) throw new TwoFourTreeException("main: wrong element removed");
-                // System.out.println();
-            }
-            System.out.println("done");
+        myTree.printAllElements();
+
+        System.out.println("removing");
+        for (int i = 0; i < TEST_SIZE; i++) {
+            System.out.println("Removing " + nums[i]);
+            int out = (Integer) myTree.removeElement(nums[i]);
+            System.out.println("Removed " + out);
+            myTree.checkTree();
+            // myTree.printAllElements();
+
+            if (out != nums[i]) throw new TwoFourTreeException("main: wrong element removed");
+        }
+        System.out.println("done");
         
     }
 
