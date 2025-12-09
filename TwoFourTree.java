@@ -39,6 +39,10 @@ public class TwoFourTree implements Dictionary {
         return (size == 0);
     }
     
+    /**
+     * @param key to check validity of
+     * @exception thrown if key not comparable
+     */
     public void checkValidKey(Object key) {
         if (treeComp.isComparable(key)) return;
 
@@ -50,19 +54,22 @@ public class TwoFourTree implements Dictionary {
      * @return int corresponding with the child
      */
     public int whatChild(TFNode child) {
+        if (child == root()) throw new TwoFourTreeException("Cannot return child index of root");
         TFNode parent = child.getParent();
         for (int i = 0; i <= parent.getNumItems(); i++) {
             if (parent.getChild(i) == child) return i;
         }
-        //return parent.getNumItems();
-        throw new TwoFourTreeException("Cannot return child index from root.");
+        throw new TwoFourTreeException("Could not return child index");
     }
 
+    /**
+     * @param node to check if left transfer possible from
+     * @return boolean correlating to left transfer being possible
+     */
     public boolean leftTransferPossible(TFNode curr) {
         if (curr == root()) return false;
 
         TFNode parent = curr.getParent();
-        //TFNode root = root();
         int childIdx = whatChild(curr);
 
         if (childIdx > parent.getNumItems() - 1) return false;
@@ -70,7 +77,11 @@ public class TwoFourTree implements Dictionary {
         TFNode sibling = parent.getChild(childIdx + 1);
         return (sibling.getNumItems() > 1);
     }
-
+    
+    /**
+     * @param node to check if right transfer possible from
+     * @return boolean correlating to right transfer being possible
+     */
     public boolean rightTransferPossible(TFNode curr) {
         if (curr == root()) return false;
 
@@ -83,6 +94,10 @@ public class TwoFourTree implements Dictionary {
         return (sibling.getNumItems() > 1);
     }
 
+    /**
+     * @param node to check if left fusion possible from
+     * @return boolean correlating to left fusion being possible
+     */
     public boolean leftFusionPossible(TFNode curr) {
         TFNode parent = curr.getParent();
         int childNum = whatChild(curr);
@@ -93,6 +108,9 @@ public class TwoFourTree implements Dictionary {
         return (sibNumItems == 1);
     }
 
+    /**
+     * @param node to perform left transfer on
+     */
     public void leftTransfer(TFNode curr) {
         /*TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
@@ -119,6 +137,9 @@ public class TwoFourTree implements Dictionary {
         rightSib.removeItem(0);
     }
 
+    /**
+     * @param node to perform right transfer on
+     */
     public void rightTransfer(TFNode curr) {
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
@@ -135,6 +156,9 @@ public class TwoFourTree implements Dictionary {
         //leftSib.setChild(leftSib.getNumItems(), null); // Unnecessary but just for cleanup
     }
 
+    /**
+     * @param node to perform left fusion on
+     */
     public void leftFusion(TFNode curr) {
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
@@ -156,6 +180,9 @@ public class TwoFourTree implements Dictionary {
         leftSib.setParent(parent);
     }
 
+    /**
+     * @param node to perform right fuison on
+     */
     public void rightFusion(TFNode curr) {
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
@@ -173,6 +200,9 @@ public class TwoFourTree implements Dictionary {
         //if (parent == null) setRoot(rightSib);
     }
 
+    /**
+     * @param node to fix underflow on
+     */
     public void fixUnderflow(TFNode curr) {
         if (curr == root()) {
             if (curr.getChild(0) == null) {
@@ -220,6 +250,9 @@ public class TwoFourTree implements Dictionary {
         }
     }
 
+    /**
+     * @param node to fix overflow on
+     */
     public void fixOverflow(TFNode curr) {
         if (curr == root()) {
             TFNode newRoot = new TFNode();
@@ -303,8 +336,6 @@ public class TwoFourTree implements Dictionary {
         
         TFNode currNode = root();
         int idx = -1;
-
-        //if (currNode.getItem(0).key() == (Object) 128) return (Object) 128;
 
         while (currNode != null) {
             idx = findFG(key, currNode);
