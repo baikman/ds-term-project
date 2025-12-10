@@ -117,10 +117,10 @@ public class TwoFourTree implements Dictionary {
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
         TFNode rightSib = parent.getChild(childIdx + 1);
-        Item parItem = parent.getItem(0);
+        Item parItem = parent.getItem(childIdx);
 
         curr.addItem(0, parItem);
-        parent.replaceItem(0, rightSib.getItem(0));
+        parent.replaceItem(childIdx, rightSib.getItem(0));
 
         TFNode sibChild = rightSib.getChild(0);
 
@@ -152,7 +152,7 @@ public class TwoFourTree implements Dictionary {
             sibChild.setParent(curr);
         }
         
-        leftSib.removeItem(leftSib.getNumItems() - 1);
+        leftSib.deleteItem(leftSib.getNumItems() - 1);
     }
 
     /**
@@ -442,10 +442,10 @@ public class TwoFourTree implements Dictionary {
                         }
                     }
                     else  {
-                        TFNode downNode = currNode;
+                        TFNode downNode = currNode.getChild(idx + 1);
 
                         // Find the in-order successor
-                        downNode = downNode.getChild(idx + 1);
+                        //downNode = downNode.getChild(idx + 1);
 
                         // Keep going left until you reach last child
                         while (downNode.getChild(0) != null) downNode = downNode.getChild(0);
@@ -537,9 +537,9 @@ public class TwoFourTree implements Dictionary {
 
         myTree = new TwoFourTree(myComp);
 
-        int TEST_SIZE = 20;
+        int TEST_SIZE = 10000;
         int nums[] = new int[TEST_SIZE];
-        Random rand = new Random(2);
+        Random rand = new Random(12345);
 
         System.out.println("Adding " + TEST_SIZE);
         
@@ -556,10 +556,13 @@ public class TwoFourTree implements Dictionary {
         System.out.println("Removing");
         for (int i = 0; i < TEST_SIZE; i++) {
             System.out.println("Removing " + nums[i]);
+            if (nums[i] == 9) {
+                int z = 0;
+            }
             int out = (Integer) myTree.removeElement(nums[i]);
             System.out.println("Removed " + out);
             myTree.checkTree();
-            myTree.printAllElements();
+            //myTree.printAllElements();
             System.out.println();
 
             if (out != nums[i]) throw new TwoFourTreeException("main: wrong element removed");
