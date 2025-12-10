@@ -67,8 +67,6 @@ public class TwoFourTree implements Dictionary {
      * @return boolean correlating to left transfer being possible
      */
     public boolean leftTransferPossible(TFNode curr) {
-        if (curr == root()) return false;
-
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
 
@@ -83,8 +81,6 @@ public class TwoFourTree implements Dictionary {
      * @return boolean correlating to right transfer being possible
      */
     public boolean rightTransferPossible(TFNode curr) {
-        if (curr == root()) return false;
-
         TFNode parent = curr.getParent();
         int childIdx = whatChild(curr);
 
@@ -243,7 +239,7 @@ public class TwoFourTree implements Dictionary {
         else {
             rightFusion(curr);
             TFNode parent = curr.getParent();
-            
+
             if (parent.getNumItems() == 0) {
                 fixUnderflow(parent);
             }
