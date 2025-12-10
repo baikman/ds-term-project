@@ -207,12 +207,16 @@ public class TwoFourTree implements Dictionary {
     public void fixUnderflow(TFNode curr) {
         if (curr == root()) {
             if (curr.getChild(0) == null) {
-               setRoot(curr.getChild(1));
-               curr.getChild(1).setParent(null);
-               return;
+                TFNode rightChild = curr.getChild(1);
+                
+                setRoot(rightChild);
+                rightChild.setParent(null);
+                return;
             }
-            setRoot(curr.getChild(0));
-            curr.getChild(0).setParent(null);
+            TFNode leftChild = curr.getChild(0);
+            setRoot(leftChild);
+
+            leftChild.setParent(null);
             return;
         }
 
@@ -228,16 +232,20 @@ public class TwoFourTree implements Dictionary {
 
         else if (leftFusionPossible(curr)) {
             leftFusion(curr);
-            if (curr.getParent().getNumItems() == 0) {
-                fixUnderflow(curr.getParent());
+            TFNode parent = curr.getParent();
+
+            if (parent.getNumItems() == 0) {
+                fixUnderflow(parent);
             }
             return;
         }
         
         else {
             rightFusion(curr);
-            if (curr.getParent().getNumItems() == 0) {
-                fixUnderflow(curr.getParent());
+            TFNode parent = curr.getParent();
+            
+            if (parent.getNumItems() == 0) {
+                fixUnderflow(parent);
             }
             return;
         }
@@ -423,6 +431,7 @@ public class TwoFourTree implements Dictionary {
                         currNode.removeItem(idx);
                         if (currNode.getNumItems() == 0) {
                             if (currNode == root() && currNode.getChild(0) == null) {
+                                size--;
                                 return toReturn;
                             }
                             else if (currNode == root()) {
@@ -436,8 +445,6 @@ public class TwoFourTree implements Dictionary {
                     else  {
                         // Find the in-order successor
                         TFNode downNode = currNode.getChild(idx + 1);
-
-                        //downNode = downNode.getChild(idx + 1);
 
                         // Keep going left until you reach last child
                         while (downNode.getChild(0) != null) downNode = downNode.getChild(0);
@@ -458,6 +465,7 @@ public class TwoFourTree implements Dictionary {
             currNode = currNode.getChild(idx);
         }
 
+        size--;
         return toReturn;
     }
 
