@@ -215,14 +215,6 @@ public class TwoFourTree implements Dictionary {
             curr.getChild(0).setParent(null);
             return;
         }
-        /*if (curr.getNumItems() == 0 && curr.getChild(0) != null) {
-            if (curr.getChild(0).getNumItems() == 0) {
-                curr = curr.getChild(1);
-            }
-            else if (curr.getChild(1).getNumItems() == 0) {
-                curr = curr.getChild(0);
-            }
-        }*/
 
         if (leftTransferPossible(curr)) {
             leftTransfer(curr);
@@ -442,9 +434,9 @@ public class TwoFourTree implements Dictionary {
                         }
                     }
                     else  {
+                        // Find the in-order successor
                         TFNode downNode = currNode.getChild(idx + 1);
 
-                        // Find the in-order successor
                         //downNode = downNode.getChild(idx + 1);
 
                         // Keep going left until you reach last child
@@ -539,12 +531,12 @@ public class TwoFourTree implements Dictionary {
 
         int TEST_SIZE = 10000;
         int nums[] = new int[TEST_SIZE];
-        Random rand = new Random(12345);
+        Random rand = new Random();
 
         System.out.println("Adding " + TEST_SIZE);
         
         for (int i = 0; i < TEST_SIZE; i++) {
-            int num = rand.nextInt(TEST_SIZE);
+            int num = rand.nextInt(TEST_SIZE/5);
             nums[i] = num;
             
             myTree.insertElement(num, num);
@@ -556,13 +548,13 @@ public class TwoFourTree implements Dictionary {
         System.out.println("Removing");
         for (int i = 0; i < TEST_SIZE; i++) {
             System.out.println("Removing " + nums[i]);
-            if (nums[i] == 9) {
-                int z = 0;
-            }
             int out = (Integer) myTree.removeElement(nums[i]);
-            System.out.println("Removed " + out);
+           // System.out.println("Removed " + out);
             myTree.checkTree();
             //myTree.printAllElements();
+            if (i > TEST_SIZE - 25) {
+                myTree.printAllElements();
+            }
             System.out.println();
 
             if (out != nums[i]) throw new TwoFourTreeException("main: wrong element removed");
