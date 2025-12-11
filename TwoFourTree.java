@@ -255,6 +255,7 @@ public class TwoFourTree implements Dictionary {
             TFNode newRoot = new TFNode();
             Item rootItem = curr.getItem(2);
 
+            // Set new root and fix child pointers
             newRoot.addItem(0, rootItem);
             setRoot(newRoot);
             newRoot.setChild(0, curr);
@@ -262,13 +263,16 @@ public class TwoFourTree implements Dictionary {
 
             TFNode newChild = new TFNode();
             
+            // Set children of new root
             newRoot.setChild(1, newChild);
             newChild.setParent(newRoot);
 
             Item childItem = curr.getItem(3);
 
+            // Add item to the new child of root
             newChild.addItem(0, childItem);
             
+            // Finish fixing child-parent pointers for the new child
             TFNode child0 = curr.getChild(3);
             newChild.setChild(0, child0);
 
@@ -278,6 +282,7 @@ public class TwoFourTree implements Dictionary {
             if (child0 != null) child0.setParent(newChild);
             if (child1 != null) child1.setParent(newChild);
 
+            // Delete items 3 and 4 of curr as they are now in root and newChild
             curr.deleteItem(3);
             curr.deleteItem(2);
         }
@@ -286,15 +291,18 @@ public class TwoFourTree implements Dictionary {
             int childIdx = whatChild(curr);
             Item item = curr.getItem(2);
             
+            // Insert third item from curr into curr's parent
             parent.insertItem(childIdx, item);
 
             TFNode newChild = new TFNode();
             Item childItem = curr.getItem(3);
 
+            // Add item to the new child of root
             newChild.addItem(0, childItem);
             parent.setChild(childIdx + 1, newChild);
             newChild.setParent(parent);
 
+            // Finish fixing child-parent pointers for the new child
             TFNode child0 = curr.getChild(3);
             newChild.setChild(0, child0);
 
@@ -304,6 +312,7 @@ public class TwoFourTree implements Dictionary {
             if (child0 != null) child0.setParent(newChild);
             if (child1 != null) child1.setParent(newChild);
             
+            // Delete items 3 and 4 of curr as they are now in root and newChild
             curr.deleteItem(3);
             curr.deleteItem(2);
         }
@@ -315,6 +324,9 @@ public class TwoFourTree implements Dictionary {
      */
     public int findFG(Object key, TFNode curr) {
         Item currItem = new Item();
+
+        // Iterate through items in curr's Item array and return the first key
+        // that is greater than or equal to the argument passed
         for (int i = 0; i < curr.getNumItems(); i++) {
             currItem = curr.getItem(i);
             if (treeComp.isGreaterThanOrEqualTo(currItem.element(), key)) return i;
@@ -358,6 +370,7 @@ public class TwoFourTree implements Dictionary {
         TFNode currNode = new TFNode();
         Item item = new Item(key, element);
         
+        // When root is null (tree is empty) create a new root
         if (root() == null) {
             currNode.addItem(0, item);
             setRoot(currNode);
@@ -375,10 +388,10 @@ public class TwoFourTree implements Dictionary {
             if (currNode.getNumItems() < idx) {
                 Item currItem = currNode.getItem(idx);
 
-                // Handling duplicates
+                // Handling duplicate keys
                 if (treeComp.isEqual(currItem.key(), key)) {
                     if (currNode.getChild(idx) != null) {
-                        // Finding the in-order successor
+                        // Find the in-order successor
                         currNode = currNode.getChild(idx + 1);
 
                         // Keep going left until you reach last child
@@ -390,6 +403,8 @@ public class TwoFourTree implements Dictionary {
             }
         }
 
+
+        // Insert item into the correct index in the updated node
         currNode.insertItem(idx, item);
 
         // Check for overflow
@@ -398,6 +413,7 @@ public class TwoFourTree implements Dictionary {
             currNode = currNode.getParent();
         }
 
+        // Increment size of tree
         size++;
     }
 
