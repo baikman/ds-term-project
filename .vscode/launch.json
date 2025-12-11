@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TwoFourTree",
+            "request": "launch",
+            "mainClass": "TwoFourTree",
+            "projectName": "ds-term-project_3e3d07ff"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
